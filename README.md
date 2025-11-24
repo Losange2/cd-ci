@@ -1,198 +1,174 @@
-# 🚀 Exercice CI/CD avec GitHub Actions — Guide pas à pas
+# 🚀 Exercice CI/CD – GitHub Actions
 
-Objectif : apprendre à automatiser l’exécution des tests avec **GitHub Actions (CI)** pour détecter automatiquement les erreurs à chaque *push* ou *pull request*.
-
----
-
-## 🧰 Prérequis
-
-Avant de commencer, assure-toi d’avoir :
-
-* Node.js (version 16+ recommandée)
-* npm
-* Git installé et configuré :
-
-  ```
-  git config --global user.name "Ton Nom"
-  git config --global user.email "ton@mail"
-  ```
-* Un compte GitHub
-* (Optionnel) **GitHub CLI (`gh`)** si tu veux créer le repo depuis le terminal
+### BTS SIO SLAM – Pipeline CI avec tests automatisés
 
 ---
 
-## 📁 Contenu du projet
+## 📌 Description
+
+Cet exercice permet de découvrir l’intégration continue (**CI – Continuous Integration**) avec GitHub Actions en exécutant automatiquement des tests à chaque **push** ou **pull request**.
+
+🎯 **Objectif :** vérifier automatiquement que le code fonctionne avant validation.
+🧪 **Méthode :** exécuter un test Node.js dans la pipeline CI.
+📈 **Résultat possible :**
+
+* ✔ **Pipeline VERT** si les tests passent
+* ❌ **Pipeline ROUGE** si les tests échouent
+
+---
+
+## 📁 Structure du projet
 
 ```
-.
-├── index.js                # Petite fonction (addition)
-├── test.js                 # Test simple : addition(2,3) === 5
-├── package.json            # script "test": "node test.js"
+exercice-ci-cd-2/
+├── package.json
+├── isEven.js
+├── test.js
 └── .github/
-   └── workflows/
-       └── ci.yml           # Workflow GitHub Actions (CI)
+    └── workflows/
+        └── ci.yml
 ```
 
 ---
 
-## ✅ Étape 1 — Installer les dépendances et exécuter le test localement
+## 🧠 Fonction à tester
 
-1. Ouvre un terminal à la racine du projet.
+```js
+function isEven(number) {
+  return number % 2 === 0;
+}
+module.exports = { isEven };
+```
 
-2. Installe les dépendances :
+---
 
-   ```
-   npm install
-   ```
+## 🧪 Test automatisé
 
-3. Lance les tests :
+```js
+const { isEven } = require("./isEven");
 
-   ```
-   npm test
-   ```
+const result = isEven(4);
+
+if (result === true) {
+  console.log("✔ Test réussi : 4 est bien pair");
+  process.exit(0);
+} else {
+  console.error("❌ Test échoué : fonction incorrecte");
+  process.exit(1);
+}
+```
+
+---
+
+## ⚙ Workflow GitHub Actions (`.github/workflows/ci.yml`)
+
+```yml
+name: CI Exercice 2
+
+on: [push, pull_request]
+
+jobs:
+  test_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+```
+
+---
+
+## 🛠 Installation locale
+
+```
+npm install
+npm test
+```
 
 Résultat attendu :
-✔ **Test réussi : addition(2,3) = 5**
+
+✔ **Test réussi : 4 est bien pair**
 
 ---
 
-## ✅ Étape 2 — Initialiser Git et préparer le dépôt local
-
-Si ton projet n’a pas encore de repo Git :
+## 🚀 Envoi sur GitHub
 
 ```
 git init
 git add .
-git commit -m "Initial: ajout exercice CI/CD"
-```
-
----
-
-## ✅ Étape 3 — Créer le dépôt GitHub
-
-### Méthode via site Web
-
-1. Va sur [https://github.com](https://github.com)
-2. Clique **New repository**
-3. Nomme ton repo (ex : `exercice-ci-cd`)
-4. Clique **Create repository**
-
-### Méthode GitHub CLI
-
-```
-gh repo create TON_COMPTE/exercice-ci-cd --public --source=. --remote=origin --push
-```
-
----
-
-## ✅ Étape 4 — Pousser ton code vers GitHub
-
-Si tu as créé le repo via l’interface Web :
-
-```
-git remote add origin https://github.com/<TON_COMPTE>/<TON_REPO>.git
+git commit -m "Exercice CI/CD fonction isEven"
 git branch -M main
+git remote add origin https://github.com/<TON_COMPTE>/<TON_REPO>.git
 git push -u origin main
 ```
 
----
+Ensuite :
 
-## ✅ Étape 5 — Vérifier GitHub Actions
+1. Ouvre ton dépôt GitHub
+2. Va dans **l’onglet Actions**
+3. Le workflow s’exécute automatiquement ✔
 
-1. Va dans l’onglet **Actions** de ton repo
-2. Tu verras un workflow nommé **CI Demo** (d’après ton `ci.yml`)
-3. Clique dessus pour voir les étapes :
-
-   * checkout
-   * setup-node
-   * npm install
-   * npm test
-
-Chaque étape affiche ses logs.
+👉 Si l’état est **VERT**, ta CI fonctionne parfaitement.
 
 ---
 
-## 🔎 Lire les logs & relancer un job
+## 🔥 Mettre volontairement le pipeline au ROUGE
 
-Dans une exécution :
+Dans `test.js`, remplace :
 
-* clique sur le job
-* développe une étape pour lire les logs
-* pour relancer :
-
-  * fais un nouveau commit/push
-  * **ou** clique sur **Re-run jobs**
-
----
-
-## 🛠️ Dépannage courant
-
-### 🔴 Le workflow est rouge
-
-Ouvre les logs pour comprendre l’erreur.
-
-Erreurs fréquentes :
-
-* Mauvaise version de Node
-* `npm install` échoue
-* Le test retourne un code ≠ 0
-* `package.json` mal structuré
-
-Ajoute temporairement des `console.log()` pour diagnostiquer.
-
----
-
-## 🧪 Exercice pratique
-
-1. Modifie `test.js` pour casser volontairement le test. Exemple :
-
-   ```js
-   const result = addition(10, 4);  // au lieu de 2 + 3
-   ```
-
-2. Puis :
-
-   ```
-   git add .
-   git commit -m "Test cassé volontairement"
-   git push
-   ```
-
-3. Observe GitHub Actions → le pipeline doit devenir **rouge**.
-
----
-
-## ⚙️ Ajouter un badge de statut dans le README
-
-```
-![CI](https://github.com/<USER>/<REPO>/actions/workflows/ci.yml/badge.svg)
+```js
+const result = isEven(4);
 ```
 
-Exemple :
+par :
+
+```js
+const result = isEven(5);
+```
+
+Puis :
 
 ```
-![CI](https://github.com/mon-compte/exercice-ci-cd/actions/workflows/ci.yml/badge.svg)
+npm test
+git add .
+git commit -m "Test volontaire KO"
+git push
 ```
 
----
+Résultat dans GitHub Actions :
 
-## 🔁 Extensions possibles
-
-* Utiliser Jest pour les tests
-* Ajouter un job de **lint (ESLint)**
-* Ajouter un job de build (front ou backend)
-* Déployer automatiquement (GitHub Pages, Netlify, Vercel…)
-* Configurer des **protections de branche** sur `main`
+❌ **Test échoué → pipeline rouge**
 
 ---
 
-## 📚 Bonnes pratiques rapides
+## 🎓 Compétences travaillées
 
-* Place ton workflow dans `.github/workflows/ci.yml`
-* Parallélise avec plusieurs jobs si besoin (lint, test, build)
-* Utilise **GitHub Secrets** pour les tokens et clés API
-* Documente les étapes importantes dans le README
+| Compétence          | Détail                                         |
+| ------------------- | ---------------------------------------------- |
+| **CI/CD**           | Mise en place d’une pipeline GitHub Actions    |
+| **Qualité du code** | Exécution automatique de tests                 |
+| **Collaboration**   | Validation automatique avant merge             |
+| **DevOps**          | Automatisation & industrialisation du workflow |
 
 ---
 
-🎉 **Bravo ! Tu as un pipeline CI fonctionnel avec GitHub Actions.**
+## 🎉 Conclusion
+
+Vous venez de mettre en place :
+
+✔ un projet Node.js
+✔ un test automatisé
+✔ un workflow CI GitHub Actions
+✔ un contrôle automatique de la qualité du code
+
+🧠 **C’est une compétence essentielle en entreprise dans tous les projets modernes.**
