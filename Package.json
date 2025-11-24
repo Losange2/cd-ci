@@ -1,11 +1,10 @@
 {
- "name": "exercice-ci-cd",
+ "name": "exercice-ci-cd-2",
  "version": "1.0.0",
- "description": "Projet demo CI/CD avec GitHub Actions",
- "main": "index.js",
+ "description": "Exercice CI/CD GitHub Actions fonction isEven",
+ "main": "isEven.js",
  "scripts": {
    "test": "node test.js"
  },
- "author": "Etudiant BTS SIO SLAM",
  "license": "MIT"
 }

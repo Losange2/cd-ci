@@ -1,22 +1,16 @@
-name: CI Demo
-
+name: CI Exercice 2
 on: [push, pull_request]
-
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Récupération du code
-      uses: actions/checkout@v3
-
-    - name: Installer Node
-      uses: actions/setup-node@v3
-      with:
-        node-version: 18
-
-    - name: Installation dépendances
-      run: npm install
-
-    - name: Lancement des tests
-      run: npm test || echo "Tests échoués"
+ test_job:
+   runs-on: ubuntu-latest
+   steps:
+   - name: Checkout repo
+     uses: actions/checkout@v3
+   - name: Setup Node.js
+     uses: actions/setup-node@v3
+     with:
+       node-version: 18
+   - name: Install dependencies
+     run: npm install
+   - name: Run tests
+     run: npm test
