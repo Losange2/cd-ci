@@ -1,0 +1,11 @@
+{
+ "name": "exercice-ci-cd",
+ "version": "1.0.0",
+ "description": "Projet demo CI/CD avec GitHub Actions",
+ "main": "index.js",
+ "scripts": {
+   "test": "node test.js"
+ },
+ "author": "Etudiant BTS SIO SLAM",
+ "license": "MIT"
+}
